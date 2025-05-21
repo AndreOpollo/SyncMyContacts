@@ -51,7 +51,9 @@ class ContactsRepositoryImpl(
                         )
                     }
                 }
-                emit(Resource.Success(data = contacts))
+                emit(Resource.Success(data = contacts.filter {
+                    !it.name.isNullOrBlank()
+                }.distinctBy{it.name?.trim()?.lowercase()}))
                 emit(Resource.Loading(false))
 
             }catch (e: Exception){
