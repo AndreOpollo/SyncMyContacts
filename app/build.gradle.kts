@@ -41,6 +41,9 @@ android {
     buildFeatures {
         compose = true
     }
+    packaging {
+        exclude("META-INF/DEPENDENCIES")
+    }
 }
 
 dependencies {
@@ -63,5 +66,17 @@ dependencies {
     implementation(libs.hilt.android)
     ksp(libs.hilt.android.compiler)
     implementation(libs.gson)
+    implementation(libs.androidx.navigation.compose)
+    implementation(libs.androidx.lifecycle.viewmodel.compose)
+    implementation(libs.androidx.hilt.navigation.compose)
+    implementation(libs.play.services.auth)
+    implementation(libs.google.api.client.android)
+    implementation(libs.google.api.client.gson)
+    implementation(libs.google.api.services.drive)
+    implementation(libs.play.services.drive)
+
+
+
+
 
 }

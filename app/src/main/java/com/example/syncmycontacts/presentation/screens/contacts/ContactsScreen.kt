@@ -1,18 +1,20 @@
-package com.example.syncmycontacts.presentation.screens
+package com.example.syncmycontacts.presentation.screens.contacts
 
 import android.Manifest
 import android.content.pm.PackageManager
-import android.util.Log.v
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.slideInVertically
+import androidx.compose.animation.slideOutVertically
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -21,27 +23,24 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.systemBarsPadding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Search
-import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
-import androidx.compose.material3.TextFieldColors
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.key
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -49,7 +48,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.modifier.modifierLocalConsumer
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.TextStyle
@@ -62,10 +60,10 @@ import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.core.content.ContextCompat
+import androidx.hilt.navigation.compose.hiltViewModel
+import com.example.syncmycontacts.data.model.Contact
 import com.example.syncmycontacts.presentation.ContactsViewModel
 import com.example.syncmycontacts.ui.theme.background
-import com.example.syncmycontacts.ui.theme.primary
-import com.example.syncmycontacts.ui.theme.primaryContainer
 import com.example.syncmycontacts.ui.theme.secondary
 import com.example.syncmycontacts.ui.theme.secondaryContainer
 import kotlin.math.abs
@@ -73,7 +71,7 @@ import kotlin.math.abs
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun ContactsScreen(
-    contactsViewModel: ContactsViewModel,
+    contactsViewModel: ContactsViewModel = hiltViewModel<ContactsViewModel>(),
 ){
     val contactUiState = contactsViewModel.contactsUiState.collectAsState()
     val filteredContacts = contactsViewModel.filteredContacts.collectAsState()
@@ -96,8 +94,7 @@ fun ContactsScreen(
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .background(color = background)
-            .systemBarsPadding()
+            .background(color = MaterialTheme.colorScheme.surface)
     ){
         TextField(
             value = searchText.value,
@@ -109,119 +106,140 @@ fun ContactsScreen(
                 .clip(CircleShape)
             ,
             leadingIcon = {
-                Icon(Icons.Default.Search,contentDescription = "Search contacts")
+                Icon(Icons.Default.Search,
+                    contentDescription = "Search contacts",
+                    tint = MaterialTheme.colorScheme.onSurface)
             },
-            placeholder = {Text("Search contacts", textAlign = TextAlign.Center)},
+            placeholder = {
+                Text("Search contacts",
+                textAlign = TextAlign.Center,
+                color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.5f),
+
+                    )},
             colors = TextFieldDefaults.colors(
                 focusedIndicatorColor = Color.Transparent,
                 unfocusedIndicatorColor = Color.Transparent,
-                unfocusedContainerColor = secondaryContainer,
-                focusedContainerColor = secondaryContainer
+                focusedContainerColor = MaterialTheme.colorScheme.secondaryContainer,
+                unfocusedContainerColor = MaterialTheme.colorScheme.secondaryContainer,
+                cursorColor = MaterialTheme.colorScheme.primary
+
             )
         )
         Spacer(modifier = Modifier.height(8.dp))
-        Button(onClick = {
-            contactsViewModel.backupContactsToJson()
-        }) {
-            Text("Backup")
-        }
-
-    LazyColumn(
-        modifier = Modifier
-            .fillMaxWidth()
-            .weight(1f),
-    ) {
-        groupedContacts.forEach { (initial, contactsForLetter) ->
-            stickyHeader(key = "header-$initial") {
-                Box(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .background(color = background)
-
-                ){
-                Text(
-                    text = initial.toString(),
-                    style = MaterialTheme.typography.headlineSmall,
-                    color = Color.LightGray,
-                    fontWeight = FontWeight.SemiBold,
-                    fontSize = 16.sp,
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(start = 32.dp),
-                    )
-             }
+    when{
+        contactUiState.value.isLoading ->{
+            Box(modifier = Modifier
+                .fillMaxSize(),
+                contentAlignment = Alignment.Center){
+                CircularProgressIndicator(
+                    color = MaterialTheme.colorScheme.primary
+                )
             }
-            
-            item(key = "card-${initial}"){
-                Card(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(horizontal = 12.dp, vertical = 8.dp)
-                        .clip(RoundedCornerShape(24.dp)),
-                    colors = CardDefaults.cardColors(
-                        containerColor = secondaryContainer
-                    ),
-                    elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
-                ) {
-                    Column(modifier = Modifier.padding(16.dp)) {
-                        contactsForLetter.forEachIndexed { index, contact ->
-                            Row(
+        }
+        groupedContacts.isEmpty()->{
+            Box(modifier = Modifier
+                .fillMaxSize(),
+                contentAlignment = Alignment.Center
+                ){
+                Text("Contacts Not Found",
+                    color = MaterialTheme.colorScheme.onSurface
+                )
+            }
+        }
+        else-> {
+          AnimatedVisibility(visible = true,
+              enter = fadeIn() + slideInVertically(),
+              exit = fadeOut() + slideOutVertically()
+              ) {
+            LazyColumn(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .weight(1f),
+            ) {
+                groupedContacts.forEach { (initial, contactsForLetter) ->
+                    stickyHeader(key = "header-$initial") {
+                        Box(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(bottom = 8.dp)
+                                .background(MaterialTheme.colorScheme.surface)
+                        ) {
+                            Text(
+                                text = initial.toString(),
+                                style = MaterialTheme.typography.headlineSmall,
+                                color = MaterialTheme.colorScheme.onSurface,
+                                fontWeight = FontWeight.SemiBold,
+                                fontSize = 18.sp,
                                 modifier = Modifier
                                     .fillMaxWidth()
-                                    .padding(bottom = 12.dp),
-                                verticalAlignment = Alignment.CenterVertically
-                            ) {
-                                DisplayPhoto(name = contact.name ?: "Unknown")
-                                Spacer(modifier = Modifier.width(16.dp))
-
-                                    Column(
-                                        modifier = Modifier.weight(1f),
-                                    ) {
-                                        HighlightedText(
-                                            text = contact.name ?: "Unknown",
-                                            searchQuery = searchText.value,
-                                            style = MaterialTheme.typography.titleMedium,
-                                            highlightColor = secondary,
-                                            normalColor = Color.White,
-                                            fontSize = 16.sp,
-                                            fontWeight = FontWeight.Bold
-                                        )
-                                        HighlightedText(
-                                            text = contact.phone ?: "Unknown",
-                                            searchQuery = searchText.value,
-                                            style = MaterialTheme.typography.bodyMedium,
-                                            highlightColor = secondary,
-                                            normalColor = Color.Gray,
-                                            fontSize = 12.sp
-
-                                        )
-                                        if(index<contactsForLetter.lastIndex){
-                                            Box(modifier = Modifier.padding(top = 4.dp)) {
-                                                HorizontalDivider()
-                                            }
-                                        }
-                                    }
-
-
-
-
-                            }
-
+                                    .padding(start = 20.dp, top = 8.dp),
+                            )
                         }
+                    }
+                    itemsIndexed(contactsForLetter,
+                        key = {index,contact->"contact-${initial}-${index}"}){index,contact->
+                        val isLastItem = index==contactsForLetter.lastIndex
+                        ContactItem(
+                            contact = contact,
+                            searchQuery = searchText.value,
+                            isLastItem = isLastItem
+                        )
 
                     }
+
                 }
-
             }
-
         }
+    }
     }
 
 
     }
 }
 @Composable
-fun ContactItem(){
+fun ContactItem(contact: Contact,
+                searchQuery: String,
+                isLastItem:Boolean){
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(bottom = 16.dp, start = 16.dp, end = 16.dp),
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        DisplayPhoto(name = contact.name ?: "Unknown")
+        Spacer(modifier = Modifier.width(16.dp))
+
+        Column(
+            modifier = Modifier.weight(1f),
+        ) {
+            HighlightedText(
+                text = contact.name ?: "Unknown",
+                searchQuery = searchQuery,
+                style = MaterialTheme.typography.titleMedium,
+                highlightColor = MaterialTheme.colorScheme.secondary.copy(alpha = 0.6f),
+                normalColor = MaterialTheme.colorScheme.onSurface,
+                fontSize = 16.sp,
+                fontWeight = FontWeight.Bold
+            )
+            HighlightedText(
+                text = contact.phone ?: "Unknown",
+                searchQuery = searchQuery,
+                style = MaterialTheme.typography.bodyMedium,
+                highlightColor = MaterialTheme.colorScheme.secondary.copy(alpha = 0.6f),
+                normalColor = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f),
+                fontSize = 12.sp
+
+            )
+            if (!isLastItem) {
+                Box(modifier = Modifier.padding(top = 4.dp)) {
+                    HorizontalDivider()
+                }
+            }
+        }
+
+
+    }
+
 
 }
 
@@ -312,12 +330,12 @@ fun DisplayPhoto(
     fontSize: TextUnit = 20.sp
 ){
     val colors = listOf<Color>(
-        Color(0xFFEF5350),
-        Color(0xFFAB47BC),
-        Color(0xFF42A5F5),
-        Color(0xFF26A69A),
-        Color(0xFFFFA726),
-        Color(0xFF66BB6A)
+        MaterialTheme.colorScheme.primary,
+        MaterialTheme.colorScheme.secondary,
+        MaterialTheme.colorScheme.tertiary,
+        MaterialTheme.colorScheme.error,
+        MaterialTheme.colorScheme.primaryContainer,
+        MaterialTheme.colorScheme.secondaryContainer
     )
     val initial = name.firstOrNull()?.uppercase()
     val backgroundColor = remember(name){
@@ -333,7 +351,7 @@ fun DisplayPhoto(
     ){
         Text(
             text = initial?:"U",
-            color = Color.White,
+            color = MaterialTheme.colorScheme.onPrimary,
             fontSize = fontSize,
             fontWeight = FontWeight.Bold
 
