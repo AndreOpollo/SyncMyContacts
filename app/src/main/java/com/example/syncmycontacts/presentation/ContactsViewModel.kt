@@ -146,4 +146,44 @@ class ContactsViewModel @Inject constructor(
                 }
         }
     }
+    fun restoreContactsFromJson(){
+        viewModelScope.launch {
+            _contactsUiState.update {
+                it.copy(
+                    successMsg = null,
+                    errorMsg = null,
+                    isLoading = true
+                )
+            }
+            contactsRepository.restoreContactsFromJson().collectLatest {
+                result->
+                when(result){
+                    is Resource.Error<*> -> {
+                        _contactsUiState.update {
+                            it.copy(
+                                isLoading = false,
+                                errorMsg = result.message
+                            )
+                        }
+                    }
+                    is Resource.Loading<*> -> {
+                        _contactsUiState.update {
+                            it.copy(
+                                isLoading = result.isLoading
+                            )
+                        }
+                    }
+                    is Resource.Success<*> -> {
+                        _contactsUiState.update{
+                            it.copy(
+                                isLoading = false,
+                                successMsg = "Successfully restored contacts",
+                                contactList = result.data!!
+                            )
+                        }
+                    }
+                }
+            }
+        }
+    }
 }
