@@ -106,7 +106,6 @@ class ContactsViewModel @Inject constructor(
         viewModelScope.launch {
             _contactsUiState.update {
                 it.copy(
-                    successMsg = null,
                     errorMsg = null,
                     isLoading = true
                 )
@@ -120,7 +119,7 @@ class ContactsViewModel @Inject constructor(
                                 it.copy(
                                     isLoading = false,
                                     errorMsg = result.message,
-                                    successMsg = null
+                                    contactsBackedUp = false
                                 )
                             }
                         }
@@ -135,9 +134,7 @@ class ContactsViewModel @Inject constructor(
                             _contactsUiState.update {
                                 it.copy(
                                     isLoading = false,
-                                    successMsg = if(result.data==true){
-                                        "Backup Successful"}else
-                                        {"Backup Failed"},
+                                    contactsBackedUp = result.data==true,
                                     errorMsg = null
                                 )
                             }
@@ -162,7 +159,8 @@ class ContactsViewModel @Inject constructor(
                         _contactsUiState.update {
                             it.copy(
                                 isLoading = false,
-                                errorMsg = result.message
+                                errorMsg = result.message,
+                                contactsRestored = false
                             )
                         }
                     }
@@ -177,12 +175,113 @@ class ContactsViewModel @Inject constructor(
                         _contactsUiState.update{
                             it.copy(
                                 isLoading = false,
-                                successMsg = "Successfully restored contacts",
+                                contactsRestored = true,
                                 contactList = result.data!!
                             )
                         }
                     }
                 }
+            }
+        }
+    }
+    fun exportContactsAsXls(){
+        viewModelScope.launch {
+            _contactsUiState.update {
+                it.copy(
+                    isLoading = true,
+                    exportSuccess = false
+                )
+            }
+            contactsRepository
+                .exportContactsAsXls(contactsUiState
+                    .value
+                    .contactList).collectLatest {
+                        result->
+                        when(result){
+                            is Resource.Error<*> -> {
+                                _contactsUiState.update {
+                                    it.copy(
+                                        isLoading = false,
+                                        errorMsg = result.message
+                                    )
+                                }
+                            }
+                            is Resource.Loading<*> -> {
+                                _contactsUiState.update {
+                                    it.copy(
+                                        isLoading = result.isLoading
+                                    )
+                                }
+                            }
+                            is Resource.Success<*> -> {
+                                _contactsUiState.update {
+                                    it.copy(
+                                        isLoading = false,
+                                        exportSuccess = result.data==true,
+                                    )
+                                }
+                            }
+                        }
+                }
+        }
+    }
+    fun exportContactsAsVcf(){
+        viewModelScope.launch {
+            _contactsUiState.update {
+                it.copy(
+                    isLoading = true,
+                    errorMsg = null,
+                    exportSuccess = false
+                )
+            }
+            contactsRepository
+                .exportContactsAsVcf(contactsUiState
+                    .value
+                    .contactList).collectLatest {
+                        result->
+                        when(result){
+                            is Resource.Error<*> -> {
+                                _contactsUiState.update {
+                                    it.copy(
+                                        isLoading = false,
+                                        errorMsg = result.message
+                                    )
+                                }
+                            }
+                            is Resource.Loading<*> -> {
+                                _contactsUiState.update {
+                                    it.copy(
+                                        isLoading = result.isLoading
+                                    )
+                                }
+                            }
+                            is Resource.Success<*> -> {
+                                _contactsUiState.update {
+                                    it.copy(
+                                        isLoading = false,
+                                        exportSuccess = result.data == true
+                                    )
+                                }
+                            }
+                        }
+                }
+        }
+    }
+    fun resetContactsRestoredFlag(){
+        viewModelScope.launch {
+            _contactsUiState.update {
+                it.copy(
+                    contactsRestored = false
+                )
+            }
+        }
+    }
+    fun resetContactsBackedUpFlag(){
+        viewModelScope.launch {
+            _contactsUiState.update {
+                it.copy(
+                    contactsBackedUp = false
+                )
             }
         }
     }

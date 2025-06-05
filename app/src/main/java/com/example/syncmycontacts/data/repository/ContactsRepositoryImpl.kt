@@ -1,9 +1,13 @@
 package com.example.syncmycontacts.data.repository
 
+import android.R.id.message
 import android.content.ContentProvider
 import android.content.ContentProviderOperation
+import android.content.ContentValues
 import android.content.Context
+import android.os.Environment
 import android.provider.ContactsContract
+import android.provider.MediaStore
 import com.example.syncmycontacts.data.model.Contact
 import com.example.syncmycontacts.domain.ContactsRepository
 import com.example.syncmycontacts.util.Resource
@@ -12,6 +16,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.withContext
+import org.apache.poi.hssf.usermodel.HSSFWorkbook
 import java.io.File
 
 class ContactsRepositoryImpl(
@@ -117,6 +122,102 @@ class ContactsRepositoryImpl(
             }
         }
     }
+
+    override suspend fun exportContactsAsXls(contacts: List<Contact>): Flow<Resource<Boolean>> {
+        return flow {
+            emit(Resource.Loading(true))
+            try {
+                val resolver = context.contentResolver
+                val fileName = "contacts_export.xls"
+                val values = ContentValues().apply {
+                    put(MediaStore.Downloads.DISPLAY_NAME,fileName)
+                    put(MediaStore.Downloads.MIME_TYPE,"application/vnd.ms-excel")
+                    put(MediaStore.Downloads.RELATIVE_PATH,
+                        Environment.DIRECTORY_DOWNLOADS)
+                    put(MediaStore.Downloads.IS_PENDING,1)
+                }
+                val uri = resolver.insert(MediaStore.Downloads.EXTERNAL_CONTENT_URI,
+                    values)
+                if(uri!=null){
+                    resolver.openOutputStream(uri)?.use {
+                        outputStream->
+                        val workbook = HSSFWorkbook()
+                        val sheet = workbook.createSheet("Contacts")
+                        val header = sheet.createRow(0)
+                        header.createCell(0).setCellValue("Name")
+                        header.createCell(1).setCellValue("Phone")
+                        contacts.forEachIndexed {
+                            index,contact->
+                            val row = sheet.createRow(index+1)
+                            row.createCell(0).setCellValue(contact.name)
+                            row.createCell(1).setCellValue(contact.phone)
+                        }
+                        workbook.write(outputStream)
+                        workbook.close()
+                    }
+                    values.clear()
+                    values.put(MediaStore.Downloads.IS_PENDING,0)
+                    resolver.update(uri,values,null,null)
+                    emit(Resource.Success(true))
+                }else{
+                    emit(Resource.Error(message = "Failed to create XLS file"))
+                }
+
+
+            }catch (e: Exception){
+                e.printStackTrace()
+                emit(Resource.Error(message = e.localizedMessage?:"Something went wrong"))
+            } finally {
+                emit(Resource.Loading(false))
+            }
+        }
+    }
+
+    override suspend fun exportContactsAsVcf(contacts: List<Contact>): Flow<Resource<Boolean>> {
+        return flow {
+            emit(Resource.Loading(true))
+            try {
+                val resolver = context.contentResolver
+                val filename = "contacts_export.vcf"
+                val values = ContentValues().apply {
+                    put(MediaStore.Downloads.DISPLAY_NAME,filename)
+                    put(MediaStore.Downloads.MIME_TYPE,"text/x-vcard")
+                    put(MediaStore.Downloads.RELATIVE_PATH, Environment.DIRECTORY_DOWNLOADS)
+                    put(MediaStore.Downloads.IS_PENDING,1)
+                }
+                val uri = resolver
+                    .insert(MediaStore.Downloads.EXTERNAL_CONTENT_URI,values)
+                if(uri!=null){
+                    resolver.openOutputStream(uri)?.use{
+                        outputStream->
+                        contacts.forEach {
+                            contact->
+                            val vcard = """
+                                BEGIN:VCARD
+                                VERSION:3.0
+                                FN:${contact.name}
+                                TEL:${contact.phone}
+                                END:VCARD
+                            """.trimIndent()
+                            outputStream.write(vcard.toByteArray())
+                        }
+                    }
+                    values.clear()
+                    values.put(MediaStore.Downloads.IS_PENDING,0)
+                    resolver.update(uri,values,null,null)
+                    emit(Resource.Success(true))
+                }else{
+                    emit(Resource.Error(message = "Failed to create VCF file"))
+                }
+            }catch (e: Exception){
+                e.printStackTrace()
+                emit(Resource.Error(message = e.localizedMessage?:"Something went wrong"))
+            } finally {
+                emit(Resource.Loading(false))
+            }
+        }
+    }
+
     private fun insertContactToDevice(contact:Contact){
         try {
             val ops = ArrayList<ContentProviderOperation>()

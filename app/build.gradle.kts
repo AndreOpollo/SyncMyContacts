@@ -10,11 +10,11 @@ plugins {
 
 android {
     namespace = "com.example.syncmycontacts"
-    compileSdk = 35
+    compileSdk = 36
 
     defaultConfig {
         applicationId = "com.example.syncmycontacts"
-        minSdk = 24
+        minSdk = 29
         targetSdk = 35
         versionCode = 1
         versionName = "1.0"
@@ -74,6 +74,8 @@ dependencies {
     implementation(libs.google.api.client.gson)
     implementation(libs.google.api.services.drive)
     implementation(libs.play.services.drive)
+    implementation(libs.poi)
+
 
 
 

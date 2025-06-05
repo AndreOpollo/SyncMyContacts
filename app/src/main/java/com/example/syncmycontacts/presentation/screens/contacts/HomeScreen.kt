@@ -1,6 +1,7 @@
 package com.example.syncmycontacts.presentation.screens.contacts
 
 import android.Manifest
+import android.R.attr.description
 import android.content.pm.PackageManager
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
@@ -13,9 +14,13 @@ import androidx.compose.material.icons.filled.Call
 import androidx.compose.material.icons.filled.DateRange
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material.icons.filled.Settings
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.ModalBottomSheetDefaults.properties
+import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
@@ -100,14 +105,16 @@ fun HomeScreen(
             icon = Icons.Default.DateRange,
             description = "Excel SpreadSheet",
             onClick = {
-
+                contactsViewModel.exportContactsAsXls()
             }
         ),
         FormatOption(
             name = "VCF",
             icon = Icons.Default.DateRange,
             description = "vCard Contact File",
-            onClick = {}
+            onClick = {
+                contactsViewModel.exportContactsAsVcf()
+            }
         )
     )
 
@@ -139,5 +146,58 @@ fun HomeScreen(
             )
         }
     }
+    when{
+        contactsUiState.value.contactsRestored->{
+            CustomAlertDialog(
+                onDismiss = {
+                    contactsViewModel.resetContactsRestoredFlag()
+                },
+                onClickOk = {
+                    contactsViewModel.fetchContacts()
+                    contactsViewModel.resetContactsRestoredFlag()
+                },
+                title = "Restore Contacts",
+                description = "Contacts Restored Successfully"
+            )            
+        }
+        contactsUiState.value.contactsBackedUp->{
+            CustomAlertDialog(
+                onDismiss = {
+                    contactsViewModel
+                        .resetContactsBackedUpFlag()
+                },
+                onClickOk = {
+                    contactsViewModel
+                        .resetContactsBackedUpFlag()
+                },
+                title = "Backup Contacts",
+                description = "Contacts Backed Up Successfully"
+            )            
+        }
+    }
     
+}
+
+@Composable
+fun CustomAlertDialog(
+    onDismiss:()->Unit,
+    onClickOk:()->Unit,
+    title:String,
+    description:String
+){
+    AlertDialog(
+        onDismissRequest = {onDismiss()},
+        confirmButton = {
+            TextButton(onClick = onClickOk) {
+                Text("OK")
+            }
+        },
+        title = {
+            Text(text=title)
+        },
+        text =  {
+            Text(text=description)
+        },
+    )
+
 }
