@@ -3,19 +3,19 @@
 SyncMyContacts is an Android app fully built with Kotlin and Jetpack Compose that allows users to effortlessly backup, restore, and export their contacts in XLS or VCF format. It features a single-screen UI with a built-in search bar for quickly filtering contacts.
 
 ## 🚀 Features
-🔄 Local Backup & Restore of device contacts
+- 🔄 Local Backup & Restore of device contacts
 
-📤 Export Contacts as:
+- 📤 Export Contacts as:
 
-📄 .xls using Apache POI
+   - 📄 .xls using Apache POI
 
-📇 .vcf (vCard) format
+   - 📇 .vcf (vCard) format
 
-🔍 Search Functionality to quickly filter through contacts
+- 🔍 Search Functionality to quickly filter through contacts
 
-🧑‍💻 Single-Screen UI using modern Material 3 design principles
+- 🧑‍💻 Single-Screen UI using modern Material 3 design principles
 
-✅ Full support for Scoped Storage on Android 10+
+- ✅ Full support for Scoped Storage on Android 10+
 
 ## 🛠 Tech Stack
 | Layer       | Tools / Libraries                                                |
