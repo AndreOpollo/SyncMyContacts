@@ -18,13 +18,15 @@ SyncMyContacts is an Android app fully built with Kotlin and Jetpack Compose tha
 ✅ Full support for Scoped Storage on Android 10+
 
 ## 🛠 Tech Stack
-Layer	Tools / Libraries
-UI	Jetpack Compose
-Theming	Material 3
-DI	Dagger Hilt
-Data Flow	Kotlin Flow
-XLS Support	Apache POI
-File Access	Scoped Storage & MediaStore APIs
+| Layer       | Tools / Libraries                                                |
+| ----------- | ---------------------------------------------------------------- |
+| UI          | [Jetpack Compose](https://developer.android.com/jetpack/compose) |
+| Theming     | [Material Theme ](https://m3.material.io/)                       |
+| DI          | [Dagger Hilt](https://dagger.dev/hilt/)                          |
+| Data Flow   | [Kotlin Flow](https://developer.android.com/kotlin/flow)         |
+| XLS Support | [Apache POI](https://poi.apache.org/)                            |
+| File Access | Scoped Storage & MediaStore APIs                                 |
+
 
 📸 Screenshots
 (Add screenshots here if you have them to showcase backup, restore, search UI, etc.)
