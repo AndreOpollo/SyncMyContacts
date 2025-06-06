@@ -2,9 +2,15 @@ package com.example.syncmycontacts.presentation.screens.contacts
 
 import android.Manifest
 import android.R.attr.description
+import android.content.Intent
 import android.content.pm.PackageManager
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.scaleIn
+import androidx.compose.animation.scaleOut
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
@@ -105,6 +111,7 @@ fun HomeScreen(
             icon = Icons.Default.DateRange,
             description = "Excel SpreadSheet",
             onClick = {
+                selectedAction = null
                 contactsViewModel.exportContactsAsXls()
             }
         ),
@@ -113,6 +120,7 @@ fun HomeScreen(
             icon = Icons.Default.DateRange,
             description = "vCard Contact File",
             onClick = {
+                selectedAction = null
                 contactsViewModel.exportContactsAsVcf()
             }
         )
@@ -157,7 +165,9 @@ fun HomeScreen(
                     contactsViewModel.resetContactsRestoredFlag()
                 },
                 title = "Restore Contacts",
-                description = "Contacts Restored Successfully"
+                description = "Contacts Restored Successfully",
+                confirmButtonText = "OK",
+                visible = contactsUiState.value.contactsRestored
             )            
         }
         contactsUiState.value.contactsBackedUp->{
@@ -171,8 +181,36 @@ fun HomeScreen(
                         .resetContactsBackedUpFlag()
                 },
                 title = "Backup Contacts",
-                description = "Contacts Backed Up Successfully"
+                description = "Contacts Backed Up Successfully",
+                confirmButtonText = "OK",
+                visible = contactsUiState.value.contactsBackedUp
             )            
+        }
+        contactsUiState.value.exportSuccess->{
+            CustomAlertDialog(
+                onDismiss = {
+                    contactsViewModel.resetExportSuccessFlag()
+                },
+                onClickOk = {
+                    contactsViewModel.resetExportSuccessFlag()
+                    contactsUiState.value.exportedFileUri?.let {
+                        uri->
+                        val intent = Intent(Intent.ACTION_VIEW).apply {
+                            setDataAndType(uri,
+                                context.contentResolver.getType(uri))
+                            flags = Intent.FLAG_GRANT_READ_URI_PERMISSION or
+                                    Intent.FLAG_ACTIVITY_NEW_TASK
+                        }
+                        context.startActivity(intent)
+                    }
+
+                },
+                title = "Export Contacts",
+                description = contactsUiState.value.exportedFileSuccessMsg?:
+                "Contacts Exported Successfully",
+                confirmButtonText = "Go to File",
+                visible = contactsUiState.value.exportSuccess
+            )
         }
     }
     
@@ -183,21 +221,29 @@ fun CustomAlertDialog(
     onDismiss:()->Unit,
     onClickOk:()->Unit,
     title:String,
-    description:String
+    description:String,
+    confirmButtonText:String,
+    visible: Boolean
 ){
-    AlertDialog(
-        onDismissRequest = {onDismiss()},
-        confirmButton = {
-            TextButton(onClick = onClickOk) {
-                Text("OK")
-            }
-        },
-        title = {
-            Text(text=title)
-        },
-        text =  {
-            Text(text=description)
-        },
-    )
+    AnimatedVisibility(
+        visible = visible,
+        enter = fadeIn() + scaleIn(initialScale = 0.9f),
+        exit = fadeOut() + scaleOut(targetScale = 0.9f)
+    ) {
 
+        AlertDialog(
+            onDismissRequest = { onDismiss() },
+            confirmButton = {
+                TextButton(onClick = onClickOk) {
+                    Text(text = confirmButtonText)
+                }
+            },
+            title = {
+                Text(text = title)
+            },
+            text = {
+                Text(text = description)
+            },
+        )
+    }
 }

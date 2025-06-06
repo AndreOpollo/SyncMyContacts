@@ -5,6 +5,7 @@ import android.content.ContentProvider
 import android.content.ContentProviderOperation
 import android.content.ContentValues
 import android.content.Context
+import android.net.Uri
 import android.os.Environment
 import android.provider.ContactsContract
 import android.provider.MediaStore
@@ -123,7 +124,7 @@ class ContactsRepositoryImpl(
         }
     }
 
-    override suspend fun exportContactsAsXls(contacts: List<Contact>): Flow<Resource<Boolean>> {
+    override suspend fun exportContactsAsXls(contacts: List<Contact>): Flow<Resource<Pair<Uri, String>>> {
         return flow {
             emit(Resource.Loading(true))
             try {
@@ -158,7 +159,7 @@ class ContactsRepositoryImpl(
                     values.clear()
                     values.put(MediaStore.Downloads.IS_PENDING,0)
                     resolver.update(uri,values,null,null)
-                    emit(Resource.Success(true))
+                    emit(Resource.Success(uri to "${contacts.size} contacts exported to XLS file"))
                 }else{
                     emit(Resource.Error(message = "Failed to create XLS file"))
                 }
@@ -173,7 +174,7 @@ class ContactsRepositoryImpl(
         }
     }
 
-    override suspend fun exportContactsAsVcf(contacts: List<Contact>): Flow<Resource<Boolean>> {
+    override suspend fun exportContactsAsVcf(contacts: List<Contact>): Flow<Resource<Pair<Uri, String>>> {
         return flow {
             emit(Resource.Loading(true))
             try {
@@ -205,7 +206,7 @@ class ContactsRepositoryImpl(
                     values.clear()
                     values.put(MediaStore.Downloads.IS_PENDING,0)
                     resolver.update(uri,values,null,null)
-                    emit(Resource.Success(true))
+                    emit(Resource.Success(uri to "${contacts.size} contacts exported to VCF file"))
                 }else{
                     emit(Resource.Error(message = "Failed to create VCF file"))
                 }

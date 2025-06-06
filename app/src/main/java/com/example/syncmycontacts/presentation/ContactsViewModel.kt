@@ -217,7 +217,9 @@ class ContactsViewModel @Inject constructor(
                                 _contactsUiState.update {
                                     it.copy(
                                         isLoading = false,
-                                        exportSuccess = result.data==true,
+                                        exportSuccess = true,
+                                        exportedFileUri = result.data?.first,
+                                        exportedFileSuccessMsg = result.data?.second
                                     )
                                 }
                             }
@@ -259,7 +261,9 @@ class ContactsViewModel @Inject constructor(
                                 _contactsUiState.update {
                                     it.copy(
                                         isLoading = false,
-                                        exportSuccess = result.data == true
+                                        exportSuccess = true,
+                                        exportedFileUri = result.data?.first,
+                                        exportedFileSuccessMsg = result.data?.second
                                     )
                                 }
                             }
@@ -281,6 +285,15 @@ class ContactsViewModel @Inject constructor(
             _contactsUiState.update {
                 it.copy(
                     contactsBackedUp = false
+                )
+            }
+        }
+    }
+    fun resetExportSuccessFlag(){
+        viewModelScope.launch {
+            _contactsUiState.update {
+                it.copy(
+                    exportSuccess = false
                 )
             }
         }

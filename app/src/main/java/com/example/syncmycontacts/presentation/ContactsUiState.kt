@@ -1,5 +1,6 @@
 package com.example.syncmycontacts.presentation
 
+import android.net.Uri
 import com.example.syncmycontacts.data.model.Contact
 
 data class ContactsUiState(
@@ -10,5 +11,7 @@ data class ContactsUiState(
     val contactsRestored:Boolean = false,
     val contactsBackedUp:Boolean = false,
     val exportSuccess:Boolean = false,
-    val importSuccess:Boolean = false
+    val importSuccess:Boolean = false,
+    val exportedFileUri:Uri? = null,
+    val exportedFileSuccessMsg:String?=null
 )

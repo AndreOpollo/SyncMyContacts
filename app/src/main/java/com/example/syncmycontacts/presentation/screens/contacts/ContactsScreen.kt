@@ -343,7 +343,7 @@ fun DisplayPhoto(
     }
 
     Box(
-        modifier = Modifier
+        modifier = modifier
             .size(size)
             .clip(CircleShape)
             .background(backgroundColor),
