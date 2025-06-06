@@ -134,8 +134,9 @@ class ContactsViewModel @Inject constructor(
                             _contactsUiState.update {
                                 it.copy(
                                     isLoading = false,
-                                    contactsBackedUp = result.data==true,
-                                    errorMsg = null
+                                    contactsBackedUp = true,
+                                    errorMsg = null,
+                                    backupSuccessMsg = result.data
                                 )
                             }
                         }
@@ -176,7 +177,7 @@ class ContactsViewModel @Inject constructor(
                             it.copy(
                                 isLoading = false,
                                 contactsRestored = true,
-                                contactList = result.data!!
+                                restoreSuccessMsg = result.data
                             )
                         }
                     }

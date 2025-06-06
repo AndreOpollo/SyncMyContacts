@@ -1,4 +1,4 @@
-package com.example.syncmycontacts.presentation
+package com.example.syncmycontacts.presentation.components
 
 
 
@@ -149,8 +149,6 @@ fun SpeedDialItem(
             }
         }
     }
-
-
 }
 
 @Composable
@@ -165,7 +163,6 @@ private fun SpeedDialItemRow(
             stiffness = Spring.StiffnessLow
         )
     )
-
     Row(
         modifier = Modifier.scale(scale),
         verticalAlignment = Alignment.CenterVertically,
@@ -203,7 +200,5 @@ private fun SpeedDialItemRow(
                 modifier = Modifier.size(18.dp)
             )
         }
-
     }
-
 }

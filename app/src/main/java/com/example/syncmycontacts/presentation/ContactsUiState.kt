@@ -13,5 +13,7 @@ data class ContactsUiState(
     val exportSuccess:Boolean = false,
     val importSuccess:Boolean = false,
     val exportedFileUri:Uri? = null,
-    val exportedFileSuccessMsg:String?=null
+    val exportedFileSuccessMsg:String?=null,
+    val backupSuccessMsg:String?=null,
+    val restoreSuccessMsg:String?=null
 )

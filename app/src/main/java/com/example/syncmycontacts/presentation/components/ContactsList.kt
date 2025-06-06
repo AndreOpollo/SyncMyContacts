@@ -1,4 +1,4 @@
-package com.example.syncmycontacts.presentation.screens.contacts
+package com.example.syncmycontacts.presentation.components
 
 import android.Manifest
 import android.content.pm.PackageManager
@@ -20,16 +20,12 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.systemBarsPadding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Search
-import androidx.compose.material3.Card
-import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
@@ -63,14 +59,11 @@ import androidx.core.content.ContextCompat
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.example.syncmycontacts.data.model.Contact
 import com.example.syncmycontacts.presentation.ContactsViewModel
-import com.example.syncmycontacts.ui.theme.background
-import com.example.syncmycontacts.ui.theme.secondary
-import com.example.syncmycontacts.ui.theme.secondaryContainer
 import kotlin.math.abs
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
-fun ContactsScreen(
+fun ContactsList(
     contactsViewModel: ContactsViewModel = hiltViewModel<ContactsViewModel>(),
 ){
     val contactUiState = contactsViewModel.contactsUiState.collectAsState()
@@ -228,7 +221,6 @@ fun ContactItem(contact: Contact,
                 highlightColor = MaterialTheme.colorScheme.secondary.copy(alpha = 0.6f),
                 normalColor = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f),
                 fontSize = 12.sp
-
             )
             if (!isLastItem) {
                 Box(modifier = Modifier.padding(top = 4.dp)) {
@@ -236,11 +228,7 @@ fun ContactItem(contact: Contact,
                 }
             }
         }
-
-
     }
-
-
 }
 
 @Composable
@@ -354,9 +342,6 @@ fun DisplayPhoto(
             color = MaterialTheme.colorScheme.onPrimary,
             fontSize = fontSize,
             fontWeight = FontWeight.Bold
-
         )
-
     }
-
 }

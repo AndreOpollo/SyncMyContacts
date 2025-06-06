@@ -8,8 +8,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Scaffold
 import androidx.compose.ui.Modifier
-import com.example.syncmycontacts.presentation.screens.contacts.ContactsScreen
-import com.example.syncmycontacts.presentation.screens.contacts.HomeScreen
+import com.example.syncmycontacts.presentation.screen.HomeScreen
 import com.example.syncmycontacts.ui.theme.SyncMyContactsTheme
 import dagger.hilt.android.AndroidEntryPoint
 

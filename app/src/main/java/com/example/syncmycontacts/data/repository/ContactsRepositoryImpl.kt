@@ -74,7 +74,7 @@ class ContactsRepositoryImpl(
 
     }
 
-    override suspend fun backupContactsToJson(contacts: List<Contact>): Flow<Resource<Boolean>> {
+    override suspend fun backupContactsToJson(contacts: List<Contact>): Flow<Resource<String>> {
        return flow{
            emit(Resource.Loading(true))
            try {
@@ -83,17 +83,17 @@ class ContactsRepositoryImpl(
 
                val file = File(context.filesDir,"contacts_backup.json")
                file.writeText(jsonString)
-               emit(Resource.Success(true))
-               emit(Resource.Loading(false))
+               emit(Resource.Success("${contacts.size} contact(s) successfully backed up"))
            }   catch (e: Exception){
                e.printStackTrace()
                emit(Resource.Error(message = e.localizedMessage?:"Something went wrong"))
+           } finally {
                emit(Resource.Loading(false))
            }
        }
     }
 
-    override suspend fun restoreContactsFromJson(): Flow<Resource<List<Contact>>> {
+    override suspend fun restoreContactsFromJson(): Flow<Resource<String>> {
         return flow {
             emit(Resource.Loading(true))
             try {
@@ -105,19 +105,19 @@ class ContactsRepositoryImpl(
                     val contacts = Gson()
                         .fromJson(json,
                             Array<Contact>::class.java).toList()
+                    var restoredContacts = 0
                     contacts.forEach {
                         contact->
-                        if(!contactExists(contact.name!!,contact.phone!!)){
+                        if(!contactExists(contact.name.orEmpty(),contact.phone.orEmpty())){
                             insertContactToDevice(contact)
+                            restoredContacts++
                         }
                     }
-                    emit(Resource.Success(contacts))
+                    emit(Resource.Success("$restoredContacts contact(s) restored successfully"))
                 }
-
             }catch (e: Exception){
                 e.printStackTrace()
                 emit(Resource.Error(message = e.localizedMessage?:"Something went wrong"))
-
             }finally {
                 emit(Resource.Loading(false))
             }
