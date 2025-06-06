@@ -28,10 +28,10 @@ SyncMyContacts is an Android app fully built with Kotlin and Jetpack Compose tha
 | File Access | Scoped Storage & MediaStore APIs                                 |
 
 
-📸 Screenshots
+## 📸 Screenshots
 (Add screenshots here if you have them to showcase backup, restore, search UI, etc.)
 
-📦 How It Works
+## 📦 How It Works
 Reads device contacts using ContactsContract.
 
 Backs up contacts locally as JSON for internal app use.
@@ -46,26 +46,21 @@ As .xls using Apache POI's workbook and sheet APIs
 
 All operations comply with scoped storage guidelines for Android 10+ and newer.
 
-🔧 Setup & Installation
+## 🔧 Setup & Installation
 Clone the repo
 
-bash
-Copy
-Edit
 git clone https://github.com/yourusername/SyncMyContacts.git
+
 Open in Android Studio Hedgehog or later
 
 Run on an emulator or real device (API 29+ recommended)
 
 Grant contacts and storage permissions when prompted
 
-✅ Permissions Required
+## ✅ Permissions Required
 READ_CONTACTS
 
 WRITE_CONTACTS
 
-READ_EXTERNAL_STORAGE (for Android < 10)
-
-WRITE_EXTERNAL_STORAGE (for Android < 10)
 
 Uses MediaStore API and Storage Access Framework on Android 10+ for scoped storage compliance.
