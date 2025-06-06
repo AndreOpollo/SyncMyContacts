@@ -47,20 +47,21 @@ As .xls using Apache POI's workbook and sheet APIs
 All operations comply with scoped storage guidelines for Android 10+ and newer.
 
 ## 🔧 Setup & Installation
-Clone the repo
+- Clone the repo
 
+```bash
 git clone https://github.com/yourusername/SyncMyContacts.git
 
-Open in Android Studio Hedgehog or later
+- Open in Android Studio Hedgehog or later
 
-Run on an emulator or real device (API 29+ recommended)
+- Run on an emulator or real device (API 29+ recommended)
 
-Grant contacts and storage permissions when prompted
+- Grant contacts and storage permissions when prompted
 
 ## ✅ Permissions Required
-READ_CONTACTS
+- READ_CONTACTS
 
-WRITE_CONTACTS
+- WRITE_CONTACTS
 
 
-Uses MediaStore API and Storage Access Framework on Android 10+ for scoped storage compliance.
+- Uses MediaStore API and Storage Access Framework on Android 10+ for scoped storage compliance.
