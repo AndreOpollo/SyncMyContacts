@@ -32,17 +32,17 @@ SyncMyContacts is an Android app fully built with Kotlin and Jetpack Compose tha
 (Add screenshots here if you have them to showcase backup, restore, search UI, etc.)
 
 ## 📦 How It Works
-Reads device contacts using ContactsContract.
+- Reads device contacts using ContactsContract.
 
-Backs up contacts locally as JSON for internal app use.
+- Backs up contacts locally as JSON for internal app use.
 
-Restores contacts via ContentProvider insertion.
+- Restores contacts via ContentProvider insertion.
 
-Exports contacts:
+- Exports contacts:
 
-As .vcf using vCard formatting
+  - As .vcf using vCard formatting
 
-As .xls using Apache POI's workbook and sheet APIs
+  - As .xls using Apache POI's workbook and sheet APIs
 
 All operations comply with scoped storage guidelines for Android 10+ and newer.
 
@@ -51,7 +51,7 @@ All operations comply with scoped storage guidelines for Android 10+ and newer.
 
 ```bash
 git clone https://github.com/yourusername/SyncMyContacts.git
-
+```
 - Open in Android Studio Hedgehog or later
 
 - Run on an emulator or real device (API 29+ recommended)
