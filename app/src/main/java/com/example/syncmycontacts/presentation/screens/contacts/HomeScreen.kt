@@ -38,6 +38,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.style.LineHeightStyle
+import androidx.compose.ui.window.Dialog
 import androidx.core.content.ContextCompat
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.example.syncmycontacts.presentation.ContactsViewModel
@@ -167,7 +168,6 @@ fun HomeScreen(
                 title = "Restore Contacts",
                 description = "Contacts Restored Successfully",
                 confirmButtonText = "OK",
-                visible = contactsUiState.value.contactsRestored
             )            
         }
         contactsUiState.value.contactsBackedUp->{
@@ -183,7 +183,6 @@ fun HomeScreen(
                 title = "Backup Contacts",
                 description = "Contacts Backed Up Successfully",
                 confirmButtonText = "OK",
-                visible = contactsUiState.value.contactsBackedUp
             )            
         }
         contactsUiState.value.exportSuccess->{
@@ -209,7 +208,6 @@ fun HomeScreen(
                 description = contactsUiState.value.exportedFileSuccessMsg?:
                 "Contacts Exported Successfully",
                 confirmButtonText = "Go to File",
-                visible = contactsUiState.value.exportSuccess
             )
         }
     }
@@ -223,16 +221,16 @@ fun CustomAlertDialog(
     title:String,
     description:String,
     confirmButtonText:String,
-    visible: Boolean
 ){
-    AnimatedVisibility(
-        visible = visible,
-        enter = fadeIn() + scaleIn(initialScale = 0.9f),
-        exit = fadeOut() + scaleOut(targetScale = 0.9f)
-    ) {
+
 
         AlertDialog(
             onDismissRequest = { onDismiss() },
+            dismissButton = {
+                TextButton(onClick = onDismiss) {
+                    Text(text = "Cancel")
+                }
+            },
             confirmButton = {
                 TextButton(onClick = onClickOk) {
                     Text(text = confirmButtonText)
@@ -244,6 +242,8 @@ fun CustomAlertDialog(
             text = {
                 Text(text = description)
             },
+
         )
-    }
+
+
 }
