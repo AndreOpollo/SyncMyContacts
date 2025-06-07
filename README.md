@@ -29,7 +29,8 @@ SyncMyContacts is an Android app fully built with Kotlin and Jetpack Compose tha
 
 
 ## 📸 Screenshots
-(Add screenshots here if you have them to showcase backup, restore, search UI, etc.)
+
+
 <img src="https://github.com/user-attachments/assets/9117166b-c9d8-41b1-a5c1-b4a9350936ed" width="300" alt="Screenshot 1A"/>
 <img src="https://github.com/user-attachments/assets/a372b21e-38e6-427c-8bd0-2cf1f0b5e5d4" width="300" alt="Screenshot 1B"/>
 <img src="https://github.com/user-attachments/assets/26387dc8-bcc6-46f4-9e1a-0edca0c07f1c" width="300" alt="Screenshot 2A"/>
