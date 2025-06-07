@@ -1,9 +1,11 @@
 package com.example.syncmycontacts.presentation.screen
 
 import android.Manifest
+import android.R.attr.mimeType
 import android.annotation.SuppressLint
 import android.content.Intent
 import android.content.pm.PackageManager
+import android.util.Log
 import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
@@ -39,6 +41,7 @@ import com.example.syncmycontacts.presentation.components.ContactsList
 import com.example.syncmycontacts.presentation.components.FormatOption
 import com.example.syncmycontacts.presentation.components.FormatOptionsBottomSheet
 import com.example.syncmycontacts.presentation.components.SpeedDialItem
+
 
 @SuppressLint("QueryPermissionsNeeded")
 @OptIn(ExperimentalMaterial3Api::class)
@@ -182,9 +185,13 @@ fun HomeScreen(
                     contactsViewModel.resetExportSuccessFlag()
                     contactsUiState.value.exportedFileUri?.let {
                         uri->
+                        val mimeType =  context.contentResolver.getType(uri)
+                        Log.d("FileOpen", "URI: $uri")
+                        Log.d("FileOpen", "Detected MIME type: $mimeType")
+
                         val intent = Intent(Intent.ACTION_VIEW).apply {
                             setDataAndType(uri,
-                                context.contentResolver.getType(uri))
+                                mimeType)
                             flags = Intent.FLAG_GRANT_READ_URI_PERMISSION or
                                     Intent.FLAG_ACTIVITY_NEW_TASK
                         }

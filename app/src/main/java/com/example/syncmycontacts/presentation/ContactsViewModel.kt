@@ -49,7 +49,9 @@ class ContactsViewModel @Inject constructor(
         _contacts.value
     )
 
-
+   init {
+       resetErrorMsgFlag()
+   }
     fun onSearchTextChanged(text:String){
         _searchText.value = text
     }
@@ -295,6 +297,15 @@ class ContactsViewModel @Inject constructor(
             _contactsUiState.update {
                 it.copy(
                     exportSuccess = false
+                )
+            }
+        }
+    }
+    fun resetErrorMsgFlag(){
+        viewModelScope.launch {
+            _contactsUiState.update {
+                it.copy(
+                    errorMsg = null
                 )
             }
         }
